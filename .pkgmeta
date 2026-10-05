@@ -1,0 +1,18 @@
+# BigWigs packager settings. The repository root is the add-on folder, so the zip
+# holds one VulcanSimBench/ folder: the add-on only (the sim is a website).
+# Everything dev-only is left out.
+package-as: VulcanSimBench
+
+manual-changelog:
+  filename: CHANGELOG.md
+  markup-type: markdown
+
+ignore:
+  - tests
+  - dev
+  - ci
+  - media-src
+  - .github
+  - .pkgmeta
+  - .gitignore
+  - .gitattributes

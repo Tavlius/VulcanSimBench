@@ -1,0 +1,12 @@
+# Packager output
+.release/
+dist/
+# Written by the test runs
+tests/sample_*.txt
+tests/cross_*.txt
+# OS and editor clutter
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+*~

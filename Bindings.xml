@@ -1,0 +1,5 @@
+<Bindings>
+  <Binding name="VULCANSIMBENCH_EXPORT" header="VULCANSIMBENCH" category="ADDONS">
+    VulcanSimBench_Export()
+  </Binding>
+</Bindings>

@@ -1,0 +1,16 @@
+## Interface: 16001
+## Title: Vulcan SimBench
+## Notes: Copies your gear, talents and stats as a string for the Vulcan Sim at vulcanaddons.com. Out of combat only - no automation.
+## Author: Tavlius
+## Version: @project-version@
+## IconTexture: Interface\AddOns\VulcanSimBench\Media\icon
+## AddonCompartmentFunc: VulcanSimBench_OnAddonCompartmentClick
+## SavedVariables: VulcanSimBenchDB
+## SavedVariablesPerCharacter: VulcanSimBenchCharDB
+
+Util.lua
+Format.lua
+Collect.lua
+UI.lua
+Commands.lua
+Persist.lua
