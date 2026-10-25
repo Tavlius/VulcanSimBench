@@ -2,6 +2,8 @@
 ## Title: Vulcan SimBench
 ## Notes: Copies your gear, talents and stats as a string for the Vulcan Sim at vulcanaddons.com. Out of combat only - no automation.
 ## Author: Tavlius
+## X-Curse-Project-ID: 1765660
+## X-Wago-ID: E6gzVqN1
 ## Version: @project-version@
 ## IconTexture: Interface\AddOns\VulcanSimBench\Media\icon
 ## AddonCompartmentFunc: VulcanSimBench_OnAddonCompartmentClick
