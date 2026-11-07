@@ -192,9 +192,9 @@ function ns.DebugLines()
   local CT, TR = type(C_ClassTalents) == "table" and C_ClassTalents or {}, type(C_Traits) == "table" and C_Traits or {}
   local config = ns.num(ns.try(CT.GetActiveConfigID))
   add("C_ClassTalents.GetActiveConfigID: " .. raw(CT.GetActiveConfigID) .. " | C_Traits: " .. (next(TR) and "present" or "absent"))
-  local info = config and ns.try(TR.GetConfigInfo, config)
-  if type(info) == "table" and not ns.IsSecret(info) and type(info.treeIDs) == "table" then
-    for _, tree in ipairs(info.treeIDs) do
+  local cinfo = config and ns.try(TR.GetConfigInfo, config)
+  if type(cinfo) == "table" and not ns.IsSecret(cinfo) and type(cinfo.treeIDs) == "table" then
+    for _, tree in ipairs(cinfo.treeIDs) do
       local list = ns.try(TR.GetTreeNodes, tree)
       local nodes = type(list) == "table" and not ns.IsSecret(list) and list or {}
       local shown = 0
