@@ -9,7 +9,7 @@
 local _, ns = ...
 
 -- Field order in the string (stable so two exports diff cleanly).
-ns.FIELD_ORDER = { "v", "b", "d", "cls", "race", "fac", "lvl", "tal", "tr", "tn",
+ns.FIELD_ORDER = { "v", "b", "d", "cls", "race", "fac", "lvl", "tal", "tr", "tn", "ts", "tsn",
   "g", "w", "ammo", "qv", "set", "sb", "sbx", "is", "ie", "sh", "bs", "au", "miss" }
 
 -- Sheet and base-stat keys, in order.
@@ -52,6 +52,15 @@ function ns.Fields(data)
       if table.concat(ranks) ~= "" then F.tr = table.concat(ranks, "-") end
       F.tn = table.concat(names, ",")
     end
+  end
+  -- Forever's trait talents: ranked talents as spell:rank (by spell ID), and the
+  -- number of talent nodes read (so "none spent" reads apart from "not read").
+  local TT = data.traitTalents
+  if TT then
+    local parts = {}
+    for i, x in ipairs(TT.ranked) do parts[i] = ns.fmt(x.spell, 0) .. ":" .. ns.fmt(x.rank, 0) end
+    if #parts > 0 then F.ts = table.concat(parts, ",") end
+    F.tsn = ns.fmt(TT.nodes, 0)
   end
   if data.gear and #data.gear > 0 then
     local parts = {}

@@ -683,6 +683,8 @@ end
 
 -- Which talent API this client has, for /simx check: a short description or nil.
 function ns.TalentAPIAvailable()
+  local probe = {}
+  if ns.CollectTraitTalents(probe, {}) then return "C_Traits" end
   if not TreeCount() then return nil end
   -- Named only if it really answers for the first talent, as the export needs.
   local _, _, _, which = TalentInfo(1, 1)
@@ -691,9 +693,81 @@ function ns.TalentAPIAvailable()
   return spent and "points per tree only" or nil
 end
 
+-- Forever's talents (seen 7 Nov 2026 on client 1.60.1.70862): the retail trait
+-- system. The old per-tree calls are gone and C_SpecializationInfo knows one
+-- spec named after the class with no points; the ranks live in the active
+-- trait config (C_ClassTalents.GetActiveConfigID), whose one trait tree holds
+-- all three classic trees. Each node gives its rank (activeRank) and, through
+-- its entry and definition, the talent's spell ID. The export lists ranked
+-- talents by spell ID (ts) and how many talent nodes were read (tsn): the sim
+-- maps spell IDs onto its own talent table, so no tree order or position is
+-- needed here.
+local function TraitAPI()
+  local CT, TR = C_ClassTalents, C_Traits
+  if type(CT) ~= "table" or type(TR) ~= "table" or ns.IsSecret(CT) or ns.IsSecret(TR) then return nil end
+  if not (CT.GetActiveConfigID and TR.GetConfigInfo and TR.GetTreeNodes and TR.GetNodeInfo
+    and TR.GetEntryInfo and TR.GetDefinitionInfo) then return nil end
+  return CT, TR
+end
+local function plainTable(v) return type(v) == "table" and not ns.IsSecret(v) end
+
+-- A node's talent spell ID and rank: spell nil if the node names no spell
+-- (not a talent), rank nil if unreadable; the third return false if the node
+-- itself couldn't be read.
+local function TraitNode(TR, config, nodeID)
+  local n = ns.try(TR.GetNodeInfo, config, nodeID)
+  if not plainTable(n) then return nil, nil, false end
+  local entry = (plainTable(n.activeEntry) and ns.num(n.activeEntry.entryID))
+    or (plainTable(n.entryIDs) and ns.num(n.entryIDs[1]))
+  local e = entry and ns.try(TR.GetEntryInfo, config, entry)
+  local def = plainTable(e) and ns.num(e.definitionID)
+  local d = def and ns.try(TR.GetDefinitionInfo, def)
+  local spell = plainTable(d) and ns.num(d.spellID) or nil
+  if spell and spell <= 0 then spell = nil end
+  return spell, ns.num(n.activeRank), true
+end
+
+-- Reads the trait talents into data.traitTalents; false when this client has
+-- no readable trait config (the classic calls are tried instead).
+function ns.CollectTraitTalents(data, missing)
+  local CT, TR = TraitAPI()
+  if not CT then return false end
+  local config = ns.num(ns.try(CT.GetActiveConfigID))
+  local info = config and ns.try(TR.GetConfigInfo, config)
+  if not (plainTable(info) and plainTable(info.treeIDs)) then return false end
+  local ranked, nodes, bad, seen = {}, 0, false, {}
+  for _, tree in ipairs(info.treeIDs) do
+    local list = ns.try(TR.GetTreeNodes, tree)
+    if plainTable(list) then
+      for _, id in ipairs(list) do
+        local spell, rank, read = TraitNode(TR, config, id)
+        if not read then
+          bad = true   -- a node the game wouldn't describe: it may hold a rank
+        elseif spell then
+          nodes = nodes + 1
+          if rank == nil or rank < 0 or seen[spell] then
+            bad = true   -- unreadable rank, or one spell on two nodes: can't be exported as one rank
+          elseif rank > 0 then
+            ranked[#ranked + 1] = { spell = spell, rank = math.floor(rank) }
+          end
+          seen[spell] = true
+        elseif rank and rank > 0 then
+          bad = true   -- a ranked node whose talent can't be named
+        end
+      end
+    end
+  end
+  if nodes == 0 then return false end
+  table.sort(ranked, function(a, b) return a.spell < b.spell end)
+  data.traitTalents = { ranked = ranked, nodes = nodes }
+  if bad then missing[#missing + 1] = "talents" end
+  return true
+end
+
 -- Talent trees. Ranks are listed by tier, then column, which is how talent
--- calculators lay a tree out.
+-- calculators lay a tree out. Forever's trait talents are read first.
 function ns.CollectTalents(data, missing)
+  if ns.CollectTraitTalents(data, missing) then return end
   local nTabs = TreeCount()
   if not nTabs then
     missing[#missing + 1] = "talents"

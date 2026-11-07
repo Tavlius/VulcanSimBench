@@ -201,6 +201,26 @@ function H.boot(opts)
     _G.C_TooltipInfo = nil
   end
   _G.C_SpecializationInfo = nil
+  _G.C_ClassTalents, _G.C_Traits = nil, nil
+  if opts.traits then
+    -- Forever's trait talents (seen 7 Nov 2026): one config, trees of nodes; each node an entry, its
+    -- definition a spell. opts.traits = { config =, trees = { [treeID] = { {node, spell, rank, max}, ... } } }
+    -- (spell nil: a node with no talent; rank nil: unreadable).
+    local T = opts.traits
+    _G.C_ClassTalents = { GetActiveConfigID = function() return T.config end }
+    local nodes = {}
+    for _, list in pairs(T.trees or {}) do for _, n in ipairs(list) do nodes[n[1]] = n end end
+    _G.C_Traits = {
+      GetConfigInfo = function(id) if id ~= T.config then return nil end local ids = {} for k in pairs(T.trees or {}) do ids[#ids + 1] = k end table.sort(ids) return { ID = id, treeIDs = ids, name = "" } end,
+      GetTreeNodes = function(tree) local o = {} for _, n in ipairs((T.trees or {})[tree] or {}) do o[#o + 1] = n[1] end return o end,
+      GetNodeInfo = function(_, id) local n = nodes[id] if not n then return nil end
+        if T.secretNode == id then return SECRET end
+        return { ID = id, activeRank = n[3], maxRanks = n[4] or 5, entryIDs = { id * 10 }, activeEntry = T.activeEntry and { entryID = id * 10, rank = n[3] } or nil, posX = 0, posY = 0 } end,
+      GetEntryInfo = function(_, e) local n = nodes[e / 10] if not n then return nil end return { definitionID = n[2] and e or nil, maxRanks = n[4] or 5 } end,
+      GetDefinitionInfo = function(d) local n = nodes[d / 10] if not n or not n[2] then return nil end return { spellID = n[2] } end,
+    }
+    if T.noDefinition then _G.C_Traits.GetDefinitionInfo = nil end
+  end
   _G.ITEM_SPELL_TRIGGER_ONEQUIP = "Equip:"
   _G.GetNumTalentTabs, _G.GetTalentTabInfo, _G.GetNumTalents, _G.GetTalentInfo = nil, nil, nil, nil
   if not opts.noTalents then

@@ -13,4 +13,4 @@ read_globals = { "issecretvalue", "UnitName", "GetNormalizedRealmName", "UIError
   "GetSpellCritChance", "GetSpellBonusDamage", "GetSpellBonusHealing", "GetHitModifier",
   "GetSpellHitModifier", "UnitArmor", "C_UnitAuras", "UnitBuff", "BackdropTemplateMixin",
   "ChatFontNormal", "UISpecialFrames", "GameTooltip", "PaperDollFrame", "CharacterFrame",
-  "DAMAGE_TEMPLATE", "ARMOR_TEMPLATE", "RETRIEVING_ITEM_INFO", "GetLocale", "ITEM_SET_NAME", "ITEM_SET_BONUS", "ITEM_SET_BONUS_GRAY", "ITEM_SPELL_TRIGGER_ONEQUIP", "C_SpecializationInfo", "SINGLE_DAMAGE_TEMPLATE", "AMMO_DAMAGE_TEMPLATE", "date", "unpack" }
+  "DAMAGE_TEMPLATE", "ARMOR_TEMPLATE", "RETRIEVING_ITEM_INFO", "GetLocale", "ITEM_SET_NAME", "ITEM_SET_BONUS", "ITEM_SET_BONUS_GRAY", "ITEM_SPELL_TRIGGER_ONEQUIP", "C_SpecializationInfo", "C_ClassTalents", "C_Traits", "SINGLE_DAMAGE_TEMPLATE", "AMMO_DAMAGE_TEMPLATE", "date", "unpack" }
