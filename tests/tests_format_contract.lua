@@ -10,7 +10,9 @@ local H = require("harness")
 
 local CONTRACT = {
   FORMAT = "FSX1",
-  FIELD_ORDER = { "v", "b", "d", "cls", "race", "fac", "lvl", "tal", "tr", "tn",
+  -- ts and tsn (1.2.1): Forever's trait talents, added beside tal/tr/tn; a reader that
+  -- doesn't know them reads the rest unchanged, so the format stays FSX1.
+  FIELD_ORDER = { "v", "b", "d", "cls", "race", "fac", "lvl", "tal", "tr", "tn", "ts", "tsn",
     "g", "w", "ammo", "qv", "set", "sb", "sbx", "is", "ie", "sh", "bs", "au", "miss" },
   SHEET_KEYS = { "str", "agi", "sta", "int", "spi", "ap", "rap", "crit", "rcrit", "scrit",
     "hit", "shit", "sp", "heal", "armor" },

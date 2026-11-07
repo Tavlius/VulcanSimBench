@@ -81,6 +81,8 @@ One ASCII line (UTF-8 if tree names are localized). Lists use `,`, sub-fields `:
 | `tal` | Points per tree | `31-20-0` |
 | `tr` | Ranks per talent, by tier then column, per tree; absent if the client only gives tree totals | `0505...-3500...-0` |
 | `tn` | Tree names (spaces as `+`) | `Beast+Mastery,...` |
+| `ts` | Forever's talents: each ranked talent as `spellID:rank`, by spell ID (instead of `tal`, `tr` and `tn`, which Forever's client can't give) | `19552:5,24293:1` |
+| `tsn` | How many talent nodes the add-on read (with no `ts`: none spent) | `52` |
 | `g` | `slot:itemID:enchantID[:loc]` (slot 0 = ammo; loc on 16-18) | `16:12784:1900:2H` |
 | `w` | `slot:min:max:speed[:loc]` weapon base damage | `18:82:124:3.3:RG` |
 | `ammo` | Ammo damage per second | `17.5` |

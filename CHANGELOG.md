@@ -1,5 +1,15 @@
 # Changelog
 
+## v1.2.1 - Forever's talents
+
+- **Talents now export on Forever.** Forever's client keeps talents in the newer trait
+  system, which 1.2.0 didn't read, so exports showed no talents. Ranked talents are now
+  exported by spell ID (`ts`), with how many talents were read (`tsn`); the sim maps them
+  onto its talent trees. Clients with the classic talent calls still export `tal`, `tr` and
+  `tn` as before.
+- `/simx check` counts your talent points and talents; `/simx debug` lists the trait config
+  and every ranked talent, for bug reports.
+
 ## v1.2.0 - first public release
 
 - Now **Vulcan SimBench**, part of the Vulcan Suite. `/simbench`, `/simx` and `/simexport`

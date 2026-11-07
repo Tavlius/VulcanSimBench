@@ -66,6 +66,11 @@ function ns.CheckLines()
     for i, t in ipairs(data.talents) do p[i] = (t.name or "?") .. " " .. t.points end
     add("Talents: " .. table.concat(p, " / "))
   end
+  if data.traitTalents then
+    local spent = 0
+    for _, x in ipairs(data.traitTalents.ranked) do spent = spent + x.rank end
+    add("Talents: " .. spent .. " points in " .. #data.traitTalents.ranked .. " talents (" .. data.traitTalents.nodes .. " read)")
+  end
   add("Items equipped: " .. #data.gear)
   for _, slot in ipairs(ns.WEAPON_SLOTS) do
     local w = data.weapons[slot]
@@ -182,6 +187,31 @@ function ns.DebugLines()
       add("  C_SpecializationInfo.GetTalentInfo(" .. t .. "," .. i .. "): " .. fields
         .. " | GetTalentInfo: " .. raw(GetTalentInfo, t, i))
     end
+  end
+  -- Forever's trait talents: the active config, its trees, and every node with a rank (spell ID, rank, maximum, position).
+  local CT, TR = type(C_ClassTalents) == "table" and C_ClassTalents or {}, type(C_Traits) == "table" and C_Traits or {}
+  local config = ns.num(ns.try(CT.GetActiveConfigID))
+  add("C_ClassTalents.GetActiveConfigID: " .. raw(CT.GetActiveConfigID) .. " | C_Traits: " .. (next(TR) and "present" or "absent"))
+  local info = config and ns.try(TR.GetConfigInfo, config)
+  if type(info) == "table" and not ns.IsSecret(info) and type(info.treeIDs) == "table" then
+    for _, tree in ipairs(info.treeIDs) do
+      local list = ns.try(TR.GetTreeNodes, tree)
+      local nodes = type(list) == "table" and not ns.IsSecret(list) and list or {}
+      local shown = 0
+      add("  trait tree " .. show(tree) .. ": " .. #nodes .. " nodes")
+      for _, id in ipairs(nodes) do
+        local n = ns.try(TR.GetNodeInfo, config, id)
+        if type(n) == "table" and not ns.IsSecret(n) and (ns.num(n.activeRank) or 0) > 0 and shown < 60 then
+          shown = shown + 1
+          local e = type(n.entryIDs) == "table" and ns.try(TR.GetEntryInfo, config, n.entryIDs[1])
+          local d = type(e) == "table" and not ns.IsSecret(e) and ns.try(TR.GetDefinitionInfo, e.definitionID)
+          add("    node " .. show(id) .. ": spell " .. show(type(d) == "table" and not ns.IsSecret(d) and d.spellID or nil)
+            .. ", rank " .. show(n.activeRank) .. "/" .. show(n.maxRanks) .. ", at " .. show(n.posX) .. "," .. show(n.posY))
+        end
+      end
+    end
+  else
+    add("  C_Traits.GetConfigInfo: " .. raw(TR.GetConfigInfo, config))
   end
   local instant = (C_Item and C_Item.GetItemInfoInstant) or GetItemInfoInstant
   for _, slot in ipairs({ 0, 16, 17, 18 }) do
