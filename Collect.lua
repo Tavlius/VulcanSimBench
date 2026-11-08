@@ -735,7 +735,7 @@ function ns.CollectTraitTalents(data, missing)
   local config = ns.num(ns.try(CT.GetActiveConfigID))
   local info = config and ns.try(TR.GetConfigInfo, config)
   if not (plainTable(info) and plainTable(info.treeIDs)) then return false end
-  local ranked, nodes, bad, seen = {}, 0, false, {}
+  local nodes, bad, rankOf = 0, false, {}
   for _, tree in ipairs(info.treeIDs) do
     local list = ns.try(TR.GetTreeNodes, tree)
     if plainTable(list) then
@@ -745,12 +745,15 @@ function ns.CollectTraitTalents(data, missing)
           bad = true   -- a node the game wouldn't describe: it may hold a rank
         elseif spell then
           nodes = nodes + 1
-          if rank == nil or rank < 0 or seen[spell] then
-            bad = true   -- unreadable rank, or one spell on two nodes: can't be exported as one rank
-          elseif rank > 0 then
-            ranked[#ranked + 1] = { spell = spell, rank = math.floor(rank) }
+          if rank == nil or rank < 0 then
+            bad = true   -- an unreadable rank
+          else
+            -- One spell on two nodes (a Hunter's tree on 7 Nov: Lightning Reflexes twice, one node never ranked):
+            -- one rank, unless the nodes disagree, which can't be exported as one rank.
+            local r, was = math.floor(rank), rankOf[spell]
+            if was and was > 0 and r > 0 and was ~= r then bad = true end
+            if not was or r > was then rankOf[spell] = r end
           end
-          seen[spell] = true
         elseif rank and rank > 0 then
           bad = true   -- a ranked node whose talent can't be named
         end
@@ -758,6 +761,8 @@ function ns.CollectTraitTalents(data, missing)
     end
   end
   if nodes == 0 then return false end
+  local ranked = {}
+  for spell, r in pairs(rankOf) do if r > 0 then ranked[#ranked + 1] = { spell = spell, rank = r } end end
   table.sort(ranked, function(a, b) return a.spell < b.spell end)
   data.traitTalents = { ranked = ranked, nodes = nodes }
   if bad then missing[#missing + 1] = "talents" end

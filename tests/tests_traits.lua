@@ -37,10 +37,19 @@ do
   local F = export({ traits = t })
   check("traits: a ranked node with no spell is reported", F.miss and F.miss:find("talents", 1, true), F.miss)
 end
-do
+do   -- one spell on two nodes (Forever's Hunter tree, 7 Nov 2026: Lightning Reflexes twice, one node unranked)
   local t = forever(); t.trees[1091][3][2] = 24293
   local F = export({ traits = t })
-  check("traits: one spell on two nodes is reported", F.miss and F.miss:find("talents", 1, true), F.miss)
+  check("traits: one spell on two nodes, one unranked: exported once, nothing missing", F.ts == "19552:5,24293:1" and F.miss == nil and F.tsn == "3", tostring(F.ts) .. " " .. tostring(F.miss))
+  t = forever(); t.trees[1091][3][2] = 24293; t.trees[1091][3][3] = 1
+  F = export({ traits = t })
+  check("traits: ... both at the same rank: exported once", F.ts == "19552:5,24293:1" and F.miss == nil, tostring(F.ts) .. " " .. tostring(F.miss))
+  t = forever(); t.trees[1091][3][2] = 24293; t.trees[1091][3][3] = 2
+  F = export({ traits = t })
+  check("traits: ... at different ranks: reported", F.miss and F.miss:find("talents", 1, true), F.miss)
+  t = forever(); t.trees[1091][3][2] = 24293; t.trees[1091][1][3] = 0
+  F = export({ traits = t })
+  check("traits: ... both unranked: nothing exported for it, nothing missing", F.ts == "19552:5" and F.miss == nil, tostring(F.ts) .. " " .. tostring(F.miss))
 end
 do
   local F = export({ traits = forever({ secretNode = 104001 }) })
@@ -73,5 +82,13 @@ do   -- /simx check and /simx debug show the trait talents
   check("traits: /simx debug lists each ranked node with its spell", dbg:find("node 104996: spell 24293, rank 1/5", 1, true) and dbg:find("node 104001: spell 19552, rank 5/5", 1, true) and not dbg:find("node 104002", 1, true), dbg)
   local none = table.concat(H.boot().ns.DebugLines(), "\n")
   check("traits: /simx debug without the trait API says so", none:find("C_Traits: absent", 1, true), none)
+end
+do   -- the Character-panel button: beside Forever's sidebar tabs (they covered it at the panel's top right, 7 Nov 2026)
+  local h = H.boot({ sidebarTabs = true })
+  local p = h.ns.charButton and h.ns.charButton.points[1]
+  check("button: left of the sidebar tabs when they exist", p and p[1] == "RIGHT" and p[2] == _G.PaperDollSidebarTabs and p[3] == "LEFT", p and tostring(p[1]))
+  h = H.boot()
+  p = h.ns.charButton and h.ns.charButton.points[1]
+  check("button: the panel's top right without them", p and p[1] == "TOPRIGHT" and p[2] == _G.PaperDollFrame and p[4] == -40, p and tostring(p[1]))
 end
 H.finish("SimBench traits")

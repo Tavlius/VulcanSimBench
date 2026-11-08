@@ -47,6 +47,8 @@ local function newFrame(kind, name)
         return n * 12 end,
       SetHeight = function(self, v) self.height = v end,
       GetHeight = function(self) return self.height end,
+      SetPoint = function(self, ...) self.points[#self.points + 1] = { ... } end,
+      ClearAllPoints = function(self) self.points = {} end,
     }
     if m[k] then return m[k] end
     -- Any other widget method (PascalCase) is a no-op; other keys are plain
@@ -330,6 +332,8 @@ function H.boot(opts)
   _G.WorldFrame = _G.UIParent
   _G.PaperDollFrame = nil
   if not opts.noPaperDoll then _G.PaperDollFrame = newFrame("Frame", "PaperDollFrame") end
+  _G.PaperDollSidebarTabs = nil
+  if opts.sidebarTabs then _G.PaperDollSidebarTabs = newFrame("Frame", "PaperDollSidebarTabs") end
   _G.CharacterFrame = nil
   _G.UISpecialFrames = {}
   _G.GameTooltip = newFrame("GameTooltip", "GameTooltip")
