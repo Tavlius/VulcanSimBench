@@ -74,4 +74,12 @@ do   -- /simx check and /simx debug show the trait talents
   local none = table.concat(H.boot().ns.DebugLines(), "\n")
   check("traits: /simx debug without the trait API says so", none:find("C_Traits: absent", 1, true), none)
 end
+do   -- the Character-panel button: beside Forever's sidebar tabs (they covered it at the panel's top right, 7 Nov 2026)
+  local h = H.boot({ sidebarTabs = true })
+  local p = h.ns.charButton and h.ns.charButton.points[1]
+  check("button: left of the sidebar tabs when they exist", p and p[1] == "RIGHT" and p[2] == _G.PaperDollSidebarTabs and p[3] == "LEFT", p and tostring(p[1]))
+  h = H.boot()
+  p = h.ns.charButton and h.ns.charButton.points[1]
+  check("button: the panel's top right without them", p and p[1] == "TOPRIGHT" and p[2] == _G.PaperDollFrame and p[4] == -40, p and tostring(p[1]))
+end
 H.finish("SimBench traits")

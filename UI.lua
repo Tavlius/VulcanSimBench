@@ -146,7 +146,14 @@ function ns.AddCharacterButton()
   if not ok or not b then return end
   b:SetSize(48, 20)
   b:SetText("Sim")
-  b:SetPoint("TOPRIGHT", parent, "TOPRIGHT", -40, -40)
+  -- Forever's Character panel (the retail one) has a row of sidebar tabs at its top right, which covered
+  -- the button there (7 Nov 2026): beside them, on their left, when they exist.
+  local tabs = _G.PaperDollSidebarTabs
+  if type(tabs) == "table" and not ns.IsSecret(tabs) then
+    b:SetPoint("RIGHT", tabs, "LEFT", -6, 0)
+  else
+    b:SetPoint("TOPRIGHT", parent, "TOPRIGHT", -40, -40)
+  end
   b:SetScript("OnClick", function() ns.Export() end)
   b:SetScript("OnEnter", function(self)
     if not GameTooltip then return end
