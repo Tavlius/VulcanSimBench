@@ -37,10 +37,19 @@ do
   local F = export({ traits = t })
   check("traits: a ranked node with no spell is reported", F.miss and F.miss:find("talents", 1, true), F.miss)
 end
-do
+do   -- one spell on two nodes (Forever's Hunter tree, 7 Nov 2026: Lightning Reflexes twice, one node unranked)
   local t = forever(); t.trees[1091][3][2] = 24293
   local F = export({ traits = t })
-  check("traits: one spell on two nodes is reported", F.miss and F.miss:find("talents", 1, true), F.miss)
+  check("traits: one spell on two nodes, one unranked: exported once, nothing missing", F.ts == "19552:5,24293:1" and F.miss == nil and F.tsn == "3", tostring(F.ts) .. " " .. tostring(F.miss))
+  t = forever(); t.trees[1091][3][2] = 24293; t.trees[1091][3][3] = 1
+  F = export({ traits = t })
+  check("traits: ... both at the same rank: exported once", F.ts == "19552:5,24293:1" and F.miss == nil, tostring(F.ts) .. " " .. tostring(F.miss))
+  t = forever(); t.trees[1091][3][2] = 24293; t.trees[1091][3][3] = 2
+  F = export({ traits = t })
+  check("traits: ... at different ranks: reported", F.miss and F.miss:find("talents", 1, true), F.miss)
+  t = forever(); t.trees[1091][3][2] = 24293; t.trees[1091][1][3] = 0
+  F = export({ traits = t })
+  check("traits: ... both unranked: nothing exported for it, nothing missing", F.ts == "19552:5" and F.miss == nil, tostring(F.ts) .. " " .. tostring(F.miss))
 end
 do
   local F = export({ traits = forever({ secretNode = 104001 }) })

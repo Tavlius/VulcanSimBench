@@ -1,5 +1,13 @@
 # Changelog
 
+## v1.2.2 - The Sim button, and talents read on two nodes
+
+- **The Sim button is visible again** on Forever's Character panel: it sat under the row of
+  sidebar tabs at the panel's top right, and now sits just left of them.
+- **No false "Missing: talents".** Forever's Hunter talent tree lists Lightning Reflexes on two
+  nodes, one never ranked; 1.2.1 flagged any spell on two nodes. Now it exports the one rank,
+  and flags only nodes that disagree.
+
 ## v1.2.1 - Forever's talents
 
 - **Talents now export on Forever.** Forever's client keeps talents in the newer trait
